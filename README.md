@@ -1,17 +1,18 @@
 # Calendar for Telegram Bots
 A simple inline calendar for Telegram bots written in Python using pyTelegramBotAPI
 ## Description
-The file **telegramcalendar.py** creates a calendar view for Telegram Bots that uses [pyTelegramBotAPI](https://github.com/eternnoir/pyTelegramBotAPI). It uses an [inline keyboard](https://core.telegram.org/bots/2-0-intro) that lets the user execute one action when clicking one of its buttons.
+The file **telegramcalendar.py** creates a calendar view for Telegram Bots that uses [pyTelegramBotAPI](https://github.com/eternnoir/pyTelegramBotAPI). It creates an [inline keyboard](https://core.telegram.org/bots/2-0-intro) that lets the user execute one action when clicking one of its buttons.
 Furthermore, the user can change the month displayed in the inline keyboard simply clicking in one button.
-
+## Demo
+![](https://github.com/unmonoqueteclea/calendar-telegram/blob/master/example.gif)
 ## Usage
 In order to use **pyTelegramBotAPI** you will have to install it. The easiest way of doing it is with pip:
 ```bash
 pip install pyTelegramBotAPI
 ```
-To use this keyboard in your bot only copy the file **telegramcalendar.py** to yout project.
-Then you have to pass the object that returns the *create_calendar* function to the *send_message* function of pyTelegramBotAPI
-**WARNING** The configuration of the bot doesn´t appear in these snippets. In order to see a complete bot working with this library you can see the **bot.py** file.
+To use this keyboard in your bot, only copy the file **telegramcalendar.py** to yout project.
+Then you have to pass the object that returns the *create_calendar* function to the *send_message* function of pyTelegramBotAPI.
+> **WARNING** The configuration of the bot doesn´t appear in these snippets. In order to see a complete bot working with this > > library you can see the **bot.py** file.
 
 ```python
 from telegramcalendar import create_calendar
@@ -66,7 +67,7 @@ def previous_month(call):
         pass
 
 ```
-If we want to do something when the user clicks on one day, we will write the following code. The **date** variable will contain the date choosen by the user.
+If we want to do something when the user clicks on one day, we should write the following code. The **date** variable will contain the date choosen by the user.
 ```python
 @bot.callback_query_handler(func=lambda call: call.data[0:13] == 'calendar-day-')
 def get_day(call):
