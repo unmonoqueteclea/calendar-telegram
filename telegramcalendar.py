@@ -1,9 +1,6 @@
 from telebot import types
 import calendar
 
-API_URL="http://127.0.0.1:5000/"
-TOKEN=""
-
 def create_calendar(year,month):
     markup = types.InlineKeyboardMarkup()
     #First row - Month and Year
