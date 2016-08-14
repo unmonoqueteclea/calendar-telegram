@@ -2,7 +2,7 @@ from telebot import types
 import calendar
 
 API_URL="http://127.0.0.1:5000/"
-TOKEN="244734389:AAFZNXWj7cvp5sb1gN-P0tQVYqd7SULnAbQ"
+TOKEN=""
 
 def create_calendar(year,month):
     markup = types.InlineKeyboardMarkup()
