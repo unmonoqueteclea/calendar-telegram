@@ -1,4 +1,4 @@
-# Calendar for Telegram Bots
+# Date Selection tool for Telegram Bots
 A simple inline calendar for Telegram bots written in Python using [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot). Based on [calendar-telegram](https://github.com/unmonoqueteclea/calendar-telegram).
 ## Description
 The file **telegramcalendar.py** proved the API to create an [inline keyboard](https://core.telegram.org/bots/2-0-intro) for a Telegram Bot. The user can either select a date or move to the next or previous month by clicking a singe button.
@@ -23,6 +23,8 @@ def inline_handler(bot,update):
                         text="You selected %s" % (date.strftime("%d/%m/%Y")),
                         reply_markup=ReplyKeyboardRemove())
 ```
+
+> For a more complex example please check out [renfe-notifier-bot](https://github.com/grcanosa/renfe-notifier-bot)
 
 ## Demo
 ![](https://github.com/grcanosa/telegram-calendar-keyboard/blob/master/example.gif)
