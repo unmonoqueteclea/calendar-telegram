@@ -16,7 +16,8 @@ def create_options_keyboard(options, cancel_msg):
     rows = []
     for i,op in enumerate(options):
         rows.append([InlineKeyboardButton(op,callback_data="CHOSEN;"+str(i))])
-    rows.append([InlineKeyboardButton(cancel_msg,callback_data="CANCEL;0")])
+    if cancel_msg is not None:
+        rows.append([InlineKeyboardButton(cancel_msg,callback_data="CANCEL;0")])
     return InlineKeyboardMarkup(rows)
 
 
