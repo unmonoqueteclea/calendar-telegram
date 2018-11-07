@@ -1,86 +1,30 @@
-# Calendar for Telegram Bots
-A simple inline calendar for Telegram bots written in Python using pyTelegramBotAPI
+# Date Selection tool for Telegram Bots
+A simple inline calendar for Telegram bots written in Python using [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot). Based on [calendar-telegram](https://github.com/unmonoqueteclea/calendar-telegram).
 ## Description
-The file **telegramcalendar.py** creates a calendar view for Telegram Bots that uses [pyTelegramBotAPI](https://github.com/eternnoir/pyTelegramBotAPI). It creates an [inline keyboard](https://core.telegram.org/bots/2-0-intro) that lets the user execute one action when clicking one of its buttons.
-Furthermore, the user can change the month displayed in the inline keyboard simply clicking in one button.
-## Demo
-![](https://github.com/unmonoqueteclea/calendar-telegram/blob/master/example.gif)
+The file **telegramcalendar.py** proved the API to create an [inline keyboard](https://core.telegram.org/bots/2-0-intro) for a Telegram Bot. The user can either select a date or move to the next or previous month by clicking a singe button.
+
+## Internals
+The file **telegramcalendar.py** provides the user with two methods:
+* **create_calendar**: This method returns a InlineKeyboardMarkup object with the calendar in the provided year and month.
+* **process_calendar_selection:** This method can be used inside a CallbackQueryHandler method to check if the user has selected a date or wants to move to a different month. It also creates a new calendar with the same text if necessary.
+
 ## Usage
-In order to use **pyTelegramBotAPI** you will have to install it. The easiest way of doing it is with pip:
-```bash
-pip install pyTelegramBotAPI
-```
-To use this keyboard in your bot, only copy the file **telegramcalendar.py** to yout project.
-Then you have to pass the object that returns the *create_calendar* function to the *send_message* function of pyTelegramBotAPI.
-> **WARNING** The configuration of the bot doesn´t appear in these snippets. In order to see a complete bot working with this > > library you can see the **bot.py** file.
-
+To use the telecram-calendar-keyboard you need to have [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) installed first. A full working example on how to use telegram-calendar-keyboard is provided in *bot_example.py*. As you can see below, you create a calendar and add it to a message with a *reply_markup* parameter and then you can process it in a callbackqueyhandler method using the *process_calendar_selection* method:
 ```python
-from telegramcalendar import create_calendar
-current_shown_dates={}
-@bot.message_handler(commands=['calendar'])
-def get_calendar(message):
-    now = datetime.datetime.now() #Current date
-    chat_id = message.chat.id
-    date = (now.year,now.month)
-    current_shown_dates[chat_id] = date #Saving the current date in a dict
-    markup= create_calendar(now.year,now.month)
-    bot.send_message(message.chat.id, "Please, choose a date", reply_markup=markup)
+def calendar_handler(bot,update):
+    update.message.reply_text("Please select a date: ",
+                        reply_markup=telegramcalendar.create_calendar())
+
+
+def inline_handler(bot,update):
+    selected,date = telegramcalendar.process_calendar_selection(bot, update)
+    if selected:
+        bot.send_message(chat_id=update.callback_query.from_user.id,
+                        text="You selected %s" % (date.strftime("%d/%m/%Y")),
+                        reply_markup=ReplyKeyboardRemove())
 ```
-There are two more functions that you have to write in your code in order to let the user change the displayed month;
-```python
-@bot.callback_query_handler(func=lambda call: call.data == 'next-month')
-def next_month(call):
-    chat_id = call.message.chat.id
-    saved_date = current_shown_dates.get(chat_id)
-    if(saved_date is not None):
-        year,month = saved_date
-        month+=1
-        if month>12:
-            month=1
-            year+=1
-        date = (year,month)
-        current_shown_dates[chat_id] = date
-        markup= create_calendar(year,month)
-        bot.edit_message_text("Please, choose a date", call.from_user.id, call.message.message_id, reply_markup=markup)
-        bot.answer_callback_query(call.id, text="")
-    else:
-        #Do something to inform of the error
-        pass
 
-@bot.callback_query_handler(func=lambda call: call.data == 'previous-month')
-def previous_month(call):
-    chat_id = call.message.chat.id
-    saved_date = current_shown_dates.get(chat_id)
-    if(saved_date is not None):
-        year,month = saved_date
-        month-=1
-        if month<1:
-            month=12
-            year-=1
-        date = (year,month)
-        current_shown_dates[chat_id] = date
-        markup= create_calendar(year,month)
-        bot.edit_message_text("Please, choose a date", call.from_user.id, call.message.message_id, reply_markup=markup)
-        bot.answer_callback_query(call.id, text="")
-    else:
-        #Do something to inform of the error
-        pass
+> For a more complex example please check out [renfe-notifier-bot](https://github.com/grcanosa/renfe-notifier-bot)
 
-```
-If we want to do something when the user clicks on one day, we should write the following code. The **date** variable will contain the date choosen by the user.
-```python
-@bot.callback_query_handler(func=lambda call: call.data[0:13] == 'calendar-day-')
-def get_day(call):
-    chat_id = call.message.chat.id
-    saved_date = current_shown_dates.get(chat_id)
-    if(saved_date is not None):
-        day=call.data[13:]
-        date = datetime.datetime(int(saved_date[0]),int(saved_date[1]),int(day),0,0,0)
-        bot.send_message(chat_id, str(date))
-        bot.answer_callback_query(call.id, text="")
-
-    else:
-        #Do something to inform of the error
-        pass
-
-```
+## Demo
+![](https://github.com/grcanosa/telegram-calendar-keyboard/blob/master/example.gif)
