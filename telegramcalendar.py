@@ -29,8 +29,13 @@ def create_calendar(year=None,month=None):
     :return: Returns the InlineKeyboardMarkup object with the calendar.
     """
     now = datetime.datetime.now()
+    thismonth= False
     if year == None: year = now.year
-    if month == None: month = now.month
+    if month == None: 
+        month = now.month
+        thismonth = True
+    elif month == now.month: thismonth = True
+    today = now.day
     data_ignore = create_callback_data("IGNORE", year, month, 0)
     keyboard = []
     #First row - Month and Year
@@ -49,12 +54,18 @@ def create_calendar(year=None,month=None):
         for day in week:
             if(day==0):
                 row.append(InlineKeyboardButton(" ",callback_data=data_ignore))
+            elif(thismonth and (day < today)):
+                text = "(" + str(day) + ")"
+                row.append(InlineKeyboardButton(text, callback_data=data_ignore))
             else:
                 row.append(InlineKeyboardButton(str(day),callback_data=create_callback_data("DAY",year,month,day)))
         keyboard.append(row)
     #Last row - Buttons
     row=[]
-    row.append(InlineKeyboardButton("<",callback_data=create_callback_data("PREV-MONTH",year,month,day)))
+    if not thismonth:
+        row.append(InlineKeyboardButton("<",callback_data=create_callback_data("PREV-MONTH",year,month,day)))
+    else:
+        row.append(InlineKeyboardButton(" ",callback_data=data_ignore))
     row.append(InlineKeyboardButton(" ",callback_data=data_ignore))
     row.append(InlineKeyboardButton(">",callback_data=create_callback_data("NEXT-MONTH",year,month,day)))
     keyboard.append(row)
