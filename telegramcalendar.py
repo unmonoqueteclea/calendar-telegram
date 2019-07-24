@@ -38,9 +38,14 @@ def create_calendar(year=None,month=None):
     today = now.day
     data_ignore = create_callback_data("IGNORE", year, month, 0)
     keyboard = []
-    #First row - Month and Year
+    #First row - Month and Year (and prev, next button)
     row=[]
+    if not thismonth:
+        row.append(InlineKeyboardButton("<",callback_data=create_callback_data("PREV-MONTH",year,month,0)))
+    else:
+        row.append(InlineKeyboardButton(" ",callback_data=data_ignore))    
     row.append(InlineKeyboardButton(calendar.month_name[month]+" "+str(year),callback_data=data_ignore))
+    row.append(InlineKeyboardButton(">",callback_data=create_callback_data("NEXT-MONTH",year,month,0)))
     keyboard.append(row)
     #Second row - Week Days
     row=[]
@@ -60,14 +65,9 @@ def create_calendar(year=None,month=None):
             else:
                 row.append(InlineKeyboardButton(str(day),callback_data=create_callback_data("DAY",year,month,day)))
         keyboard.append(row)
-    #Last row - Buttons
+    #Last row - user's input choice
     row=[]
-    if not thismonth:
-        row.append(InlineKeyboardButton("<",callback_data=create_callback_data("PREV-MONTH",year,month,day)))
-    else:
-        row.append(InlineKeyboardButton(" ",callback_data=data_ignore))
-    row.append(InlineKeyboardButton(" ",callback_data=data_ignore))
-    row.append(InlineKeyboardButton(">",callback_data=create_callback_data("NEXT-MONTH",year,month,day)))
+    row.append(InlineKeyboardButton("Freitextfeld, bitte!", callback_data=create_callback_data("USER-INPUT",year,month,0)))
     keyboard.append(row)
 
     return InlineKeyboardMarkup(keyboard)
@@ -79,21 +79,26 @@ def process_calendar_selection(bot,update):
     backward is pressed. This method should be called inside a CallbackQueryHandler.
     :param telegram.Bot bot: The bot, as provided by the CallbackQueryHandler
     :param telegram.Update update: The update, as provided by the CallbackQueryHandler
-    :return: Returns a tuple (Boolean,datetime.datetime), indicating if a date is selected
-                and returning the date if so.
+    :return: Returns a triplet (Boolean,datetime.datetime,Boolean), indicating if a date is selected
+                and returning the date if so or if the user wants to write it himself.
     """
-    ret_data = (False,None)
+    ret_data = (False,None,False)
     query = update.callback_query
     (action,year,month,day) = separate_callback_data(query.data)
     curr = datetime.datetime(int(year), int(month), 1)
     if action == "IGNORE":
         bot.answer_callback_query(callback_query_id= query.id)
     elif action == "DAY":
+        keyboard = []
+        row = []
+        row.append(InlineKeyboardButton("Nächster Spieleabend: " + str(day) + "/" + str(month) + "/" + str(year),
+                                        callback_data=create_callback_data("IGNORE", year, month, day)))
+        keyboard.append(row)
         bot.edit_message_text(text=query.message.text,
             chat_id=query.message.chat_id,
-            message_id=query.message.message_id
-            )
-        ret_data = True,datetime.datetime(int(year),int(month),int(day))
+            message_id=query.message.message_id,
+            reply_markup=InlineKeyboardMarkup(keyboard))
+        ret_data = True,datetime.datetime(int(year),int(month),int(day)),False
     elif action == "PREV-MONTH":
         pre = curr - datetime.timedelta(days=1)
         bot.edit_message_text(text=query.message.text,
@@ -106,6 +111,9 @@ def process_calendar_selection(bot,update):
             chat_id=query.message.chat_id,
             message_id=query.message.message_id,
             reply_markup=create_calendar(int(ne.year),int(ne.month)))
+    elif action == "USER-INPUT":
+        bot.delete_message(query.message.chat_id, query.message.message_id)
+        ret_data=(True, None, True)
     else:
         bot.answer_callback_query(callback_query_id= query.id,text="Something went wrong!")
         # UNKNOWN
