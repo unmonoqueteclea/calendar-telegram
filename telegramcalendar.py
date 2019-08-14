@@ -66,6 +66,7 @@ def create_calendar(year=None, month=None):
     keyboard.append(row)
 
     my_calendar = calendar.monthcalendar(year, month)
+    valid_week = False
     for week in my_calendar:
         row = []
         for day in week:
@@ -73,14 +74,16 @@ def create_calendar(year=None, month=None):
                 row.append(InlineKeyboardButton(" ",
                                                 callback_data=data_ignore))
             elif(thismonth and (day < today)):
-                text = "(" + str(day) + ")"
-                row.append(InlineKeyboardButton(text,
+                row.append(InlineKeyboardButton(" ",
                                                 callback_data=data_ignore))
             else:
+                if not valid_week:
+                    valid_week = True
                 row.append(InlineKeyboardButton(str(day),
                            callback_data=create_callback_data(
                                                 "DAY", year, month, day)))
-        keyboard.append(row)
+        if valid_week:  # only append rows that have dates in them for readability
+            keyboard.append(row)
     # Last row - user's input choice
     row = []
     row.append(InlineKeyboardButton("Freitextfeld, bitte!",
