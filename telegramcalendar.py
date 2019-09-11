@@ -16,12 +16,12 @@ import calendar
 
 def create_callback_data(action, year, month, day):
     """ Create the callback data associated to each button"""
-    return ";".join([action, str(year), str(month), str(day)])
+    return ";".join(["CALENDAR", action, str(year), str(month), str(day)])
 
 
 def separate_callback_data(data):
     """ Separate the callback data"""
-    return data.split(";")
+    return data.split(";")[1:]
 
 
 def create_calendar(year=None, month=None):
