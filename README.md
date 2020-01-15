@@ -17,9 +17,9 @@ def calendar_handler(bot,update):
 
 
 def inline_handler(bot,update):
-    selected,date = telegramcalendar.process_calendar_selection(bot, update)
+    selected,date = telegramcalendar.process_calendar_selection(update, context)
     if selected:
-        bot.send_message(chat_id=update.callback_query.from_user.id,
+        context.bot.send_message(chat_id=update.callback_query.from_user.id,
                         text="You selected %s" % (date.strftime("%d/%m/%Y")),
                         reply_markup=ReplyKeyboardRemove())
 ```

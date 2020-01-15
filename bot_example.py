@@ -19,15 +19,15 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-def calendar_handler(bot,update):
+def calendar_handler(update, context):
     update.message.reply_text("Please select a date: ",
                         reply_markup=telegramcalendar.create_calendar())
 
 
-def inline_handler(bot,update):
-    selected,date = telegramcalendar.process_calendar_selection(bot, update)
+def inline_handler(update, context):
+    selected,date = telegramcalendar.process_calendar_selection(update, context)
     if selected:
-        bot.send_message(chat_id=update.callback_query.from_user.id,
+        context.bot.send_message(chat_id=update.callback_query.from_user.id,
                         text="You selected %s" % (date.strftime("%d/%m/%Y")),
                         reply_markup=ReplyKeyboardRemove())
 

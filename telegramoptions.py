@@ -21,23 +21,23 @@ def create_options_keyboard(options, cancel_msg):
     return InlineKeyboardMarkup(rows)
 
 
-def process_option_selection(bot, update):
+def process_option_selection(update, context):
     query = update.callback_query
     data = update.callback_query.data
     action, index = data.split(";")
     ret_data = (False,None)
     if action == "CHOSEN":
-        bot.edit_message_text(text=query.message.text,
+        context.bot.edit_message_text(text=query.message.text,
             chat_id=query.message.chat_id,
             message_id=query.message.message_id,
             )
         ret_data = True, int(index)
     elif action == "CANCEL":
-        bot.edit_message_text(text=query.message.text,
+        context.bot.edit_message_text(text=query.message.text,
             chat_id=query.message.chat_id,
             message_id=query.message.message_id
             )
         ret_data = False, 0
     else:
-        bot.answer_callback_query(callback_query_id= query.id,text="Something went wrong!")
+        context.bot.answer_callback_query(callback_query_id= query.id,text="Something went wrong!")
     return ret_data
