@@ -10,6 +10,7 @@ Base methods for calendar keyboard creation and processing.
 
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup,
                       ReplyKeyboardRemove)
+from telegram.error import BadRequest
 import datetime
 import calendar
 
@@ -141,7 +142,10 @@ def process_calendar_selection(update, context):
                               reply_markup=create_calendar(
                                   int(ne.year), int(ne.month)))
     elif action == "USER-INPUT":
-        context.bot.delete_message(query.message.chat_id, query.message.message_id)
+        try:
+            context.bot.delete_message(query.message.chat_id, query.message.message_id)
+        except BadRequest:
+            pass
         ret_data = (True, None, True)
     else:
         context.bot.answer_callback_query(callback_query_id=query.id,
