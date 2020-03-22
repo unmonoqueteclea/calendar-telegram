@@ -21,7 +21,7 @@ def separate_callback_data(data):
     return data.split(";")
 
 
-def create_calendar(year=None,month=None):
+def create_calendar(year=None, month=None, from_date=None):
     """
     Create an inline keyboard with the provided year and month
     :param int year: Year to use in the calendar, if None the current year is used.
@@ -29,8 +29,17 @@ def create_calendar(year=None,month=None):
     :return: Returns the InlineKeyboardMarkup object with the calendar.
     """
     now = datetime.datetime.now()
-    if year == None: year = now.year
-    if month == None: month = now.month
+
+    if from_date is not None:
+        from_day = from_date.day
+    else:
+        from_day = None
+
+    if year is None:
+        year = now.year
+    if month is None:
+        month = now.month
+
     data_ignore = create_callback_data("IGNORE", year, month, 0)
     keyboard = []
     #First row - Month and Year
@@ -49,12 +58,21 @@ def create_calendar(year=None,month=None):
         for day in week:
             if(day==0):
                 row.append(InlineKeyboardButton(" ",callback_data=data_ignore))
+            elif year == from_date.year and month == from_date.month and day < from_day:
+                row.append(InlineKeyboardButton(" ", callback_data=data_ignore))
             else:
                 row.append(InlineKeyboardButton(str(day),callback_data=create_callback_data("DAY",year,month,day)))
         keyboard.append(row)
     #Last row - Buttons
     row=[]
-    row.append(InlineKeyboardButton("<",callback_data=create_callback_data("PREV-MONTH",year,month,day)))
+
+    prev_month_last_date = datetime.datetime(year=year, month=month, day=1) - datetime.timedelta(days=1)
+    if prev_month_last_date < from_date:
+        prev_month_button_content, callback_data = ' ', data_ignore
+    else:
+        prev_month_button_content, callback_data = '<', create_callback_data('PREV-MONTH', year, month, day)
+
+    row.append(InlineKeyboardButton(prev_month_button_content,callback_data=callback_data))
     row.append(InlineKeyboardButton(" ",callback_data=data_ignore))
     row.append(InlineKeyboardButton(">",callback_data=create_callback_data("NEXT-MONTH",year,month,day)))
     keyboard.append(row)
@@ -62,7 +80,7 @@ def create_calendar(year=None,month=None):
     return InlineKeyboardMarkup(keyboard)
 
 
-def process_calendar_selection(bot,update):
+def process_calendar_selection(bot, update, from_date=None):
     """
     Process the callback_query. This method generates a new calendar if forward or
     backward is pressed. This method should be called inside a CallbackQueryHandler.
@@ -88,13 +106,13 @@ def process_calendar_selection(bot,update):
         bot.edit_message_text(text=query.message.text,
             chat_id=query.message.chat_id,
             message_id=query.message.message_id,
-            reply_markup=create_calendar(int(pre.year),int(pre.month)))
+            reply_markup=create_calendar(int(pre.year), int(pre.month), from_date=from_date))
     elif action == "NEXT-MONTH":
         ne = curr + datetime.timedelta(days=31)
         bot.edit_message_text(text=query.message.text,
             chat_id=query.message.chat_id,
             message_id=query.message.message_id,
-            reply_markup=create_calendar(int(ne.year),int(ne.month)))
+            reply_markup=create_calendar(int(ne.year), int(ne.month), from_date=from_date))
     else:
         bot.answer_callback_query(callback_query_id= query.id,text="Something went wrong!")
         # UNKNOWN

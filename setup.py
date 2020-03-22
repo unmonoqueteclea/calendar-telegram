@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='calendar-telegram',
-      version='0.1.0',
+      version='0.1.1',
       description='Datepicker for python-telegram-bot',
       author='',
       author_email='',
