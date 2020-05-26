@@ -62,7 +62,7 @@ def create_calendar(year=None,month=None):
     return InlineKeyboardMarkup(keyboard)
 
 
-def process_calendar_selection(bot,update):
+def process_calendar_selection(update,context):
     """
     Process the callback_query. This method generates a new calendar if forward or
     backward is pressed. This method should be called inside a CallbackQueryHandler.
@@ -73,29 +73,30 @@ def process_calendar_selection(bot,update):
     """
     ret_data = (False,None)
     query = update.callback_query
+    # print(query)
     (action,year,month,day) = separate_callback_data(query.data)
     curr = datetime.datetime(int(year), int(month), 1)
     if action == "IGNORE":
-        bot.answer_callback_query(callback_query_id= query.id)
+        context.bot.answer_callback_query(callback_query_id= query.id)
     elif action == "DAY":
-        bot.edit_message_text(text=query.message.text,
+        context.bot.edit_message_text(text=query.message.text,
             chat_id=query.message.chat_id,
             message_id=query.message.message_id
             )
         ret_data = True,datetime.datetime(int(year),int(month),int(day))
     elif action == "PREV-MONTH":
         pre = curr - datetime.timedelta(days=1)
-        bot.edit_message_text(text=query.message.text,
+        context.bot.edit_message_text(text=query.message.text,
             chat_id=query.message.chat_id,
             message_id=query.message.message_id,
             reply_markup=create_calendar(int(pre.year),int(pre.month)))
     elif action == "NEXT-MONTH":
         ne = curr + datetime.timedelta(days=31)
-        bot.edit_message_text(text=query.message.text,
+        context.bot.edit_message_text(text=query.message.text,
             chat_id=query.message.chat_id,
             message_id=query.message.message_id,
             reply_markup=create_calendar(int(ne.year),int(ne.month)))
     else:
-        bot.answer_callback_query(callback_query_id= query.id,text="Something went wrong!")
+        context.bot.answer_callback_query(callback_query_id= query.id,text="Something went wrong!")
         # UNKNOWN
     return ret_data
