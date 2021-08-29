@@ -6,6 +6,7 @@ from telegram.ext import Updater,CallbackQueryHandler,CommandHandler, CallbackCo
 from telegram import  ReplyKeyboardRemove,ParseMode, Update
 
 import telegramcalendar, telegramjcalendar
+import utils
 
 # Go to botfather and create a bot and copy the token and paste it here in token
 TOKEN = "" # token of the bot
@@ -34,9 +35,9 @@ def jcalendar_handler(update: Update, context: CallbackContext) -> int:
 def inline_handler(update,context):
     query = update.callback_query
     (kind, _, _, _, _) = utils.separate_callback_data(query.data)
-    if kind == messages.CALENDAR_CALLBACK:
+    if kind == CALENDAR_CALLBACK:
         inline_calendar_handler(update, context)
-    elif kind == messages.JCALENDAR_CALLBACK:
+    elif kind == JCALENDAR_CALLBACK:
         inline_jcalendar_handler(update, context)
 
 
