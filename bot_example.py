@@ -5,7 +5,7 @@ import logging
 from telegram.ext import Updater,CallbackQueryHandler,CommandHandler
 from telegram import  ReplyKeyboardRemove,ParseMode
 
-import telegramcalendar
+import telegramcalendar, telegramjcalendar
 
 # Go to botfather and create a bot and copy the token and paste it here in token
 TOKEN = "" # token of the bot
@@ -25,12 +25,26 @@ def calendar_handler(update,context):
                     reply_markup=telegramcalendar.create_calendar())
     
 
+def jcalendar_handler(self, update: Update, context: CallbackContext) -> int:
+    update.message.reply_text(
+        text="لطفا تاریخی را انتخاب کنید:",
+        reply_markup=telegramjcalendar.create_calendar()
+    )
+
 def inline_handler(update,context):
     selected,date = telegramcalendar.process_calendar_selection(update,context)
     if selected:
         context.bot.send_message(chat_id=update.callback_query.from_user.id,
                         text="You selected %s" % (date.strftime("%d/%m/%Y")),
                         reply_markup=ReplyKeyboardRemove())
+
+
+def inline_jcalendar_handler(self, update: Update, context: CallbackContext):
+    selected, date = telegramjcalendar.process_calendar_selection(context.bot, update)
+    if selected:
+        context.bot.send_message(chat_id=update.callback_query.from_user.id,
+                text="شما تاریخ %s را انتخاب کردید" % (date.strftime("%d/%m/%Y")),
+                reply_markup=ReplyKeyboardRemove())
 
 
 if TOKEN == "":
@@ -42,6 +56,7 @@ else:
 
     dp.add_handler(CommandHandler("start",start))
     dp.add_handler(CommandHandler("calendar",calendar_handler))
+    dp.add_handler(CommandHandler("jcalendar",jcalendar_handler))
     dp.add_handler(CallbackQueryHandler(inline_handler))
 
     updater.start_polling()
