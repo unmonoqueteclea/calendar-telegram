@@ -7,6 +7,7 @@ from telegram import  ReplyKeyboardRemove,ParseMode, Update
 
 import telegramcalendar, telegramjcalendar
 import utils
+import messages
 
 # Go to botfather and create a bot and copy the token and paste it here in token
 TOKEN = "" # token of the bot
@@ -35,9 +36,9 @@ def jcalendar_handler(update: Update, context: CallbackContext) -> int:
 def inline_handler(update,context):
     query = update.callback_query
     (kind, _, _, _, _) = utils.separate_callback_data(query.data)
-    if kind == CALENDAR_CALLBACK:
+    if kind == messages.CALENDAR_CALLBACK:
         inline_calendar_handler(update, context)
-    elif kind == JCALENDAR_CALLBACK:
+    elif kind == messages.JCALENDAR_CALLBACK:
         inline_jcalendar_handler(update, context)
 
 
@@ -53,7 +54,7 @@ def inline_jcalendar_handler(update: Update, context: CallbackContext):
     selected, date = telegramjcalendar.process_calendar_selection(context.bot, update)
     if selected:
         context.bot.send_message(chat_id=update.callback_query.from_user.id,
-                text="شما تاریخ %s را انتخاب کردید" % (date.strftime("%d/%m/%Y")),
+                text="شما تاریخ %s را انتخاب کردید" % date,
                 reply_markup=ReplyKeyboardRemove())
 
 
