@@ -1,0 +1,3 @@
+python-telegram-bot==12.7
+jdatetime
+convert_numbers
