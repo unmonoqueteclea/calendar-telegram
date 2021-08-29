@@ -1,9 +1,10 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from convert_numbers import english_to_hindi
 
 import jdatetime as datetime
+import utils
+import messages
 
-
-CALENDAR_CALLBACK = 'CALENDAR'
 
 days = [
     'شنبه', 'یک‌‌شنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه'
@@ -73,7 +74,7 @@ def create_calendar(year=None, month=None):
 def process_calendar_selection(bot, update):
     out = (False, None)
     query = update.callback_query
-    (_, action, year, month, day) = separate_callback_data(query.data)
+    (_, action, year, month, day) = utils.separate_callback_data(query.data)
     curr = datetime.datetime(int(year), int(month), 1)
     if action == "IGNORE":
         bot.answer_callback_query(callback_query_id=query.id)
@@ -130,13 +131,10 @@ def monthcalendar(year=datetime.datetime.today().year, month=datetime.datetime.t
 
 
 def translate_date_to_fa(date: str) -> str:
-    date = reformat_persian_date(date)
+    date = utils.reformat_persian_date(date)
     splitted = date.split()
     return f'{splitted[0]} {english_to_hindi(int(splitted[1]))} {splitted[2]}'
 
 
-def separate_callback_data(data):
-    return data.split(";")
-
 def create_callback_data(action, year=0, month=0, day=0):
-    return CALENDAR_CALLBACK + ";" + ";".join([action, str(year), str(month), str(day)])
+    return JCALENDAR_CALLBACK + ";" + ";".join([action, str(year), str(month), str(day)])
