@@ -2,8 +2,8 @@
 
 import logging
 
-from telegram.ext import Updater,CallbackQueryHandler,CommandHandler
-from telegram import  ReplyKeyboardRemove,ParseMode
+from telegram.ext import Updater,CallbackQueryHandler,CommandHandler, CallbackContext
+from telegram import  ReplyKeyboardRemove,ParseMode, Update
 
 import telegramcalendar, telegramjcalendar
 
@@ -25,21 +25,30 @@ def calendar_handler(update,context):
                     reply_markup=telegramcalendar.create_calendar())
     
 
-def jcalendar_handler(self, update: Update, context: CallbackContext) -> int:
+def jcalendar_handler(update: Update, context: CallbackContext) -> int:
     update.message.reply_text(
         text="لطفا تاریخی را انتخاب کنید:",
         reply_markup=telegramjcalendar.create_calendar()
     )
 
 def inline_handler(update,context):
-    selected,date = telegramcalendar.process_calendar_selection(update,context)
+    query = update.callback_query
+    (kind, _, _, _, _) = utils.separate_callback_data(query.data)
+    if kind == messages.CALENDAR_CALLBACK:
+        inline_calendar_handler(update, context)
+    elif kind == messages.JCALENDAR_CALLBACK:
+        inline_jcalendar_handler(update, context)
+
+
+def inline_calendar_handler(update, context):
+    selected,date = telegramcalendar.process_calendar_selection(update, context)
     if selected:
         context.bot.send_message(chat_id=update.callback_query.from_user.id,
                         text="You selected %s" % (date.strftime("%d/%m/%Y")),
                         reply_markup=ReplyKeyboardRemove())
 
 
-def inline_jcalendar_handler(self, update: Update, context: CallbackContext):
+def inline_jcalendar_handler(update: Update, context: CallbackContext):
     selected, date = telegramjcalendar.process_calendar_selection(context.bot, update)
     if selected:
         context.bot.send_message(chat_id=update.callback_query.from_user.id,
@@ -58,6 +67,7 @@ else:
     dp.add_handler(CommandHandler("calendar",calendar_handler))
     dp.add_handler(CommandHandler("jcalendar",jcalendar_handler))
     dp.add_handler(CallbackQueryHandler(inline_handler))
+    dp.add_handler(CallbackQueryHandler(inline_jcalendar_handler))
 
     updater.start_polling()
     updater.idle()
