@@ -14,7 +14,7 @@ import calendar
 
 def create_callback_data(action,year,month,day):
     """ Create the callback data associated to each button"""
-    return messages.JCALENDAR_CALLBACK + ";" + ";".join([action,str(year),str(month),str(day)])
+    return messages.CALENDAR_CALLBACK + ";" + ";".join([action,str(year),str(month),str(day)])
 
 def separate_callback_data(data):
     """ Separate the callback data"""
