@@ -11,6 +11,7 @@ Base methods for calendar keyboard creation and processing.
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup,ReplyKeyboardRemove
 import datetime
 import calendar
+import messages
 
 def create_callback_data(action,year,month,day):
     """ Create the callback data associated to each button"""
