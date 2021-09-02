@@ -12,14 +12,12 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup,ReplyKeyboardRem
 import datetime
 import calendar
 import messages
+import utils
+
 
 def create_callback_data(action,year,month,day):
     """ Create the callback data associated to each button"""
     return messages.CALENDAR_CALLBACK + ";" + ";".join([action,str(year),str(month),str(day)])
-
-def separate_callback_data(data):
-    """ Separate the callback data"""
-    return data.split(";")
 
 
 def create_calendar(year=None,month=None):
@@ -75,7 +73,7 @@ def process_calendar_selection(update,context):
     ret_data = (False,None)
     query = update.callback_query
     # print(query)
-    (_,action,year,month,day) = separate_callback_data(query.data)
+    (_,action,year,month,day) = utils.separate_callback_data(query.data)
     curr = datetime.datetime(int(year), int(month), 1)
     if action == "IGNORE":
         context.bot.answer_callback_query(callback_query_id= query.id)
