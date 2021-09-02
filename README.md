@@ -28,4 +28,4 @@ def inline_handler(bot,update):
 
 ## Demo
 ![](https://github.com/grcanosa/telegram-calendar-keyboard/blob/master/example.gif)
-![](https://github.com/mhbahmani/telegram-calendar-keyboard/blob/master/jalali-calendar-demo.gif)
+![](https://github.com/mhbahmani/calendar-telegram/blob/master/jalali-calendar-demo.gif)
